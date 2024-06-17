@@ -1,8 +1,7 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequiredComponent(typeof(Rigidbody2D), typeof(TouchingDirections)]
 public class EnemySkeleton : MonoBehaviour
 {
     public float walkSpeed = 3f;
@@ -14,7 +13,7 @@ public class EnemySkeleton : MonoBehaviour
         Right, Left
     }
     private WalkableDirection _walkDirection;
-    private Vector2 walkDirectionVector
+    private Vector2 walkDirectionVector;
 
     public WalkableDirection WalkDirection
     {
@@ -22,7 +21,7 @@ public class EnemySkeleton : MonoBehaviour
         set {
             if (_walkDirection != value) 
             { 
-                gameObject.transform.localScale = new Value2(gameObject.transform.localScale.x * -1, gameObject.transform.localScale.y);
+                gameObject.transform.localScale = new Vector2(gameObject.transform.localScale.x * -1, gameObject.transform.localScale.y);
                 if (value == WalkableDirection.Right)
                 {
                     walkDirectionVector = Vector2.right;
@@ -51,3 +50,4 @@ public class EnemySkeleton : MonoBehaviour
         
     }
 }
+*/
