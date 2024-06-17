@@ -25,7 +25,7 @@ public class HeroKnight : MonoBehaviour {
     private float               m_delayToIdle = 0.0f;
     private float               m_rollDuration = 8.0f / 14.0f;
     private float               m_rollCurrentTime;
-
+    private EnemySkeleton enemySkeleton;
 
     // Use this for initialization
     void Start ()
@@ -37,6 +37,7 @@ public class HeroKnight : MonoBehaviour {
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
+        enemySkeleton = FindObjectOfType<EnemySkeleton>();
     }
 
     // Update is called once per frame
@@ -107,7 +108,7 @@ public class HeroKnight : MonoBehaviour {
             m_animator.SetTrigger("Hurt");
 
         //Attack
-        else if(Input.GetKeyDown("j") && m_timeSinceAttack > 0.25f && !m_rolling)
+        else if (Input.GetKeyDown("j") && m_timeSinceAttack > 0.25f && !m_rolling)
         {
             m_currentAttack++;
 
@@ -124,6 +125,12 @@ public class HeroKnight : MonoBehaviour {
 
             // Reset timer
             m_timeSinceAttack = 0.0f;
+
+            // Trigger TakeHit on enemySkeleton
+            if (enemySkeleton != null)
+            {
+                enemySkeleton.TakeHit();
+            }
         }
 
         // Block

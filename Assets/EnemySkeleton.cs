@@ -1,53 +1,114 @@
-/*using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemySkeleton : MonoBehaviour
 {
     public float walkSpeed = 3f;
+    public Transform heroKnight;
+    public float attackDistance = 1f;
+    public Animator animator;
 
-    Rigidbody2D rb;
-    TouchingDirections touchingDirections;
-    public enum WalkableDirection
-    {
-        Right, Left
-    }
-    private WalkableDirection _walkDirection;
-    private Vector2 walkDirectionVector;
-
-    public WalkableDirection WalkDirection
-    {
-        get { return _walkDirection; }
-        set {
-            if (_walkDirection != value) 
-            { 
-                gameObject.transform.localScale = new Vector2(gameObject.transform.localScale.x * -1, gameObject.transform.localScale.y);
-                if (value == WalkableDirection.Right)
-                {
-                    walkDirectionVector = Vector2.right;
-                } else if (value == WalkableDirection.Left)
-                {
-                    walkDirectionVector = Vector2.left;
-                }
-            }
-            _walkDirection = value; }
-    }
+    private Rigidbody2D rb;
+    private bool isFollowing = false;
+    private bool isAttacking = false;
+    private bool isWalking = false;
+    private CircleCollider2D circleCollider;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        touchingDirections = GetComponent<TouchingDirections>();
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        rb.velocity = new Vector2(walkSpeed + Vector2.right.x, rb.velocity.y);
+        animator = GetComponent<Animator>();
+        circleCollider = GetComponent<CircleCollider2D>(); // Lấy Circle Collider2D của Skeleton
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        // Nếu đang follow và không attack
+        if (isFollowing && !isAttacking)
+        {
+            MoveTowardsHeroKnight();
+            isWalking = true; // Đang di chuyển khi đang theo sau
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
+            isWalking = false; // Ngừng di chuyển khi không follow hoặc đang attack
+        }
+
+        animator.SetBool("isWalking", isWalking); // Cập nhật animation di chuyển
+
+        // Nếu đang attack và khoảng cách với HeroKnight lớn hơn attackDistance
+        if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) > attackDistance)
+        {
+            EndAttack(); // Kết thúc attack
+        }
     }
+
+    private void MoveTowardsHeroKnight()
+    {
+        if (heroKnight != null)
+        {
+            // Kiểm tra khoảng cách giữa Skeleton và HeroKnight
+            float distance = Vector2.Distance(circleCollider.bounds.center, heroKnight.position);
+
+            if (distance <= attackDistance)
+            {
+                StartAttack(); // Nếu trong khoảng attackDistance thì attack
+            }
+            else
+            {
+                // Di chuyển về phía HeroKnight
+                Vector2 direction = (heroKnight.position - transform.position).normalized;
+                rb.velocity = new Vector2(direction.x * walkSpeed, rb.velocity.y);
+
+                // Đảo chiều hình dạng nếu cần
+                if (direction.x > 0 && transform.localScale.x < 0)
+                {
+                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                }
+                else if (direction.x < 0 && transform.localScale.x > 0)
+                {
+                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                }
+            }
+        }
+    }
+
+    private void StartAttack()
+    {
+        isAttacking = true;
+        rb.velocity = Vector2.zero;
+        animator.SetTrigger("attack");
+    }
+
+    public void EndAttack()
+    {
+        isAttacking = false;
+        animator.SetTrigger("endAttack"); // Kích hoạt trigger kết thúc attack
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            heroKnight = other.transform;
+            isFollowing = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isFollowing = false;
+            isAttacking = false;
+            rb.velocity = Vector2.zero;
+            isWalking = false;
+            animator.SetBool("isWalking", isWalking); // Cập nhật animation di chuyển
+        }
+    }
+    public void TakeHit()
+    {
+        animator.SetTrigger("takeHit");
+    }
+
 }
-*/
