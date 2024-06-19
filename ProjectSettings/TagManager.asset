@@ -6,6 +6,7 @@ TagManager:
   tags:
   - TutorialRequirement
   - HeroKnight
+  - Enemy
   layers:
   - Default
   - TransparentFX

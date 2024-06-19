@@ -8,7 +8,8 @@ public class HeroKnight : MonoBehaviour {
     [SerializeField] float      m_rollForce = 6.0f;
     [SerializeField] bool       m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
-
+    [SerializeField] int maxHealth = 6;
+    [SerializeField] private int attackDamage = 1;
     private Animator            m_animator;
     private Rigidbody2D         m_body2d;
     private Sensor_HeroKnight   m_groundSensor;
@@ -26,7 +27,8 @@ public class HeroKnight : MonoBehaviour {
     private float               m_rollDuration = 8.0f / 14.0f;
     private float               m_rollCurrentTime;
     private EnemySkeleton enemySkeleton;
-
+    private int currentHealth;
+    private bool isDead = false;
     // Use this for initialization
     void Start ()
     {
@@ -38,6 +40,7 @@ public class HeroKnight : MonoBehaviour {
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
         enemySkeleton = FindObjectOfType<EnemySkeleton>();
+        currentHealth = maxHealth;
     }
 
     // Update is called once per frame
@@ -127,10 +130,10 @@ public class HeroKnight : MonoBehaviour {
             m_timeSinceAttack = 0.0f;
 
             // Trigger TakeHit on enemySkeleton
-            if (enemySkeleton != null)
+            /*if (enemySkeleton != null)
             {
                 enemySkeleton.TakeHit();
-            }
+            }*/
         }
 
         // Block
@@ -182,6 +185,54 @@ public class HeroKnight : MonoBehaviour {
 
     // Animation Events
     // Called in slide animation.
+
+    public void TakeDamage(int damage)
+    {
+        if (!isDead) {
+            currentHealth -= damage;
+
+            if (currentHealth <= 0)
+            {
+                Die();
+            }
+            else
+            {
+                m_animator.SetTrigger("Hurt");
+            }
+        }
+        
+    }
+    private void Die()
+    {
+        isDead = true;
+        m_animator.SetTrigger("Death");
+    }
+    public bool IsDead()
+    {
+        return isDead;
+    }
+    public void OnAttackHit()
+    {
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, 0.5f); // Bán kính tấn công có thể điều chỉnh
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            if (enemy.CompareTag("Enemy"))
+            {
+                EnemySkeleton enemySkeleton = enemy.GetComponent<EnemySkeleton>();
+                if (enemySkeleton != null)
+                {
+                    enemySkeleton.TakeDamage(attackDamage);
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.5f); 
+    }
     void AE_SlideDust()
     {
         Vector3 spawnPosition;

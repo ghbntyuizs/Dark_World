@@ -5,6 +5,10 @@ public class EnemySkeleton : MonoBehaviour
     public float walkSpeed = 3f;
     public Transform heroKnight;
     public float attackDistance = 1f;
+    public int attackDamage = 1;
+    public int health = 5;
+    public float attackCooldown = 1.5f;
+    private float nextAttackTime;
     public Animator animator;
 
     private Rigidbody2D rb;
@@ -12,7 +16,7 @@ public class EnemySkeleton : MonoBehaviour
     private bool isAttacking = false;
     private bool isWalking = false;
     private CircleCollider2D circleCollider;
-
+    private bool isDead = false;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -22,27 +26,69 @@ public class EnemySkeleton : MonoBehaviour
 
     private void Update()
     {
-        // Nếu đang follow và không attack
-        if (isFollowing && !isAttacking)
+        if (isDead) // Kiểm tra xem có phải đã chết không
         {
-            MoveTowardsHeroKnight();
-            isWalking = true; // Đang di chuyển khi đang theo sau
+            rb.velocity = Vector2.zero;
+            isWalking = false;
+            isFollowing = false;
+            isAttacking = false;
+            animator.SetBool("isWalking", isWalking);
+            return; // Thoát khỏi update nếu đã chết
+        }
+
+        if (heroKnight != null && !heroKnight.GetComponent<HeroKnight>().IsDead())
+        {
+            // Nếu đang follow và không attack
+            if (isFollowing && !isAttacking)
+            {
+                MoveTowardsHeroKnight();
+                isWalking = true;
+            }
+            else
+            {
+                rb.velocity = Vector2.zero;
+                isWalking = false;
+            }
+
+            animator.SetBool("isWalking", isWalking);
+
+            // Nếu đang attack và khoảng cách với HeroKnight lớn hơn attackDistance
+            if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) > attackDistance)
+            {
+                EndAttack();
+            }
         }
         else
         {
+            // Hero đã chết, ngừng mọi hành động của Skeleton
             rb.velocity = Vector2.zero;
-            isWalking = false; // Ngừng di chuyển khi không follow hoặc đang attack
+            isWalking = false;
+            isFollowing = false;
+            isAttacking = false;
+            animator.SetBool("isWalking", isWalking);
         }
-
-        animator.SetBool("isWalking", isWalking); // Cập nhật animation di chuyển
-
-        // Nếu đang attack và khoảng cách với HeroKnight lớn hơn attackDistance
-        if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) > attackDistance)
+    }
+    public void TakeDamage(int damage)
+    {
+        if (isDead) return;
+        health -= damage;
+        if (health <= 0)
         {
-            EndAttack(); // Kết thúc attack
+            Die();
+        }
+        else
+        {
+            animator.SetTrigger("takeHit");
         }
     }
 
+    private void Die()
+    {
+        isDead = true;
+        animator.SetTrigger("die");
+        rb.velocity = Vector2.zero;
+        Destroy(gameObject, 2f);
+    }
     private void MoveTowardsHeroKnight()
     {
         if (heroKnight != null)
@@ -75,6 +121,7 @@ public class EnemySkeleton : MonoBehaviour
 
     private void StartAttack()
     {
+        if (isDead) return;
         isAttacking = true;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("attack");
@@ -88,6 +135,7 @@ public class EnemySkeleton : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (isDead) return;
         if (other.CompareTag("Player"))
         {
             heroKnight = other.transform;
@@ -106,9 +154,21 @@ public class EnemySkeleton : MonoBehaviour
             animator.SetBool("isWalking", isWalking); // Cập nhật animation di chuyển
         }
     }
-    public void TakeHit()
+    public void AttackPlayer()
     {
-        animator.SetTrigger("takeHit");
+        if (heroKnight != null && Vector2.Distance(transform.position, heroKnight.position) <= attackDistance)
+        {
+            HeroKnight hero = heroKnight.GetComponent<HeroKnight>();
+            if (hero != null)
+            {
+                hero.TakeDamage(attackDamage);
+            }
+        }
     }
 
+    // Gọi phương thức AttackPlayer từ Animation Event trong animation attack của Skeleton
+    public void OnAttackHit()
+    {
+        AttackPlayer();
+    }
 }
