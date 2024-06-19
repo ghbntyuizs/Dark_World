@@ -10,23 +10,22 @@ public class EnemySkeleton : MonoBehaviour
     public float attackCooldown = 1.5f;
     private float nextAttackTime;
     public Animator animator;
-
     private Rigidbody2D rb;
     private bool isFollowing = false;
     private bool isAttacking = false;
     private bool isWalking = false;
-    private CircleCollider2D circleCollider;
+    private BoxCollider2D boxCollider;
     private bool isDead = false;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        circleCollider = GetComponent<CircleCollider2D>(); // Lấy Circle Collider2D của Skeleton
+        boxCollider = GetComponent<BoxCollider2D>(); // Lấy Circle Collider2D của Skeleton
     }
 
     private void Update()
     {
-        if (isDead) // Kiểm tra xem có phải đã chết không
+        if (isDead) // Kiểm tra xem đã chết chưa
         {
             rb.velocity = Vector2.zero;
             isWalking = false;
@@ -52,15 +51,24 @@ public class EnemySkeleton : MonoBehaviour
 
             animator.SetBool("isWalking", isWalking);
 
-            // Nếu đang attack và khoảng cách với HeroKnight lớn hơn attackDistance
-            if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) > attackDistance)
+            // Nếu đang attack và khoảng cách với HeroKnight nhỏ hơn hoặc bằng attackDistance
+            if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) <= attackDistance)
             {
-                EndAttack();
+                // Kiểm tra xem đã đến thời điểm tấn công tiếp theo chưa
+                if (Time.time >= nextAttackTime)
+                {
+                    AttackPlayer();
+                    nextAttackTime = Time.time + attackCooldown; // Cập nhật thời gian tấn công tiếp theo
+                }
+            }
+            else if (isAttacking && Vector2.Distance(transform.position, heroKnight.position) > attackDistance)
+            {
+                EndAttack(); // Kết thúc tấn công nếu khoảng cách với HeroKnight lớn hơn attackDistance
             }
         }
         else
         {
-            // Hero đã chết, ngừng mọi hành động của Skeleton
+            // Hero đã chết hoặc không còn tồn tại, ngừng mọi hành động của Skeleton
             rb.velocity = Vector2.zero;
             isWalking = false;
             isFollowing = false;
@@ -89,12 +97,17 @@ public class EnemySkeleton : MonoBehaviour
         rb.velocity = Vector2.zero;
         Destroy(gameObject, 2f);
     }
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
     private void MoveTowardsHeroKnight()
     {
         if (heroKnight != null)
         {
             // Kiểm tra khoảng cách giữa Skeleton và HeroKnight
-            float distance = Vector2.Distance(circleCollider.bounds.center, heroKnight.position);
+            float distance = Vector2.Distance(transform.position, heroKnight.position);
 
             if (distance <= attackDistance)
             {
@@ -156,7 +169,9 @@ public class EnemySkeleton : MonoBehaviour
     }
     public void AttackPlayer()
     {
-        if (heroKnight != null && Vector2.Distance(transform.position, heroKnight.position) <= attackDistance)
+        if (isDead) return;
+        if (heroKnight != null && !heroKnight.GetComponent<HeroKnight>().IsDead() &&
+           Vector2.Distance(transform.position, heroKnight.position) <= attackDistance)
         {
             HeroKnight hero = heroKnight.GetComponent<HeroKnight>();
             if (hero != null)

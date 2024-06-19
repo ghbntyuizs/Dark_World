@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class HeroKnight : MonoBehaviour {
 
@@ -10,6 +11,7 @@ public class HeroKnight : MonoBehaviour {
     [SerializeField] GameObject m_slideDust;
     [SerializeField] int maxHealth = 6;
     [SerializeField] private int attackDamage = 1;
+    [SerializeField] private LayerMask enemyLayer;
     private Animator            m_animator;
     private Rigidbody2D         m_body2d;
     private Sensor_HeroKnight   m_groundSensor;
@@ -29,6 +31,7 @@ public class HeroKnight : MonoBehaviour {
     private EnemySkeleton enemySkeleton;
     private int currentHealth;
     private bool isDead = false;
+    private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
     // Use this for initialization
     void Start ()
     {
@@ -211,19 +214,38 @@ public class HeroKnight : MonoBehaviour {
     {
         return isDead;
     }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            EnemySkeleton enemy = other.GetComponent<EnemySkeleton>();
+            if (enemy != null && !enemiesInRange.Contains(enemy))
+            {
+                enemiesInRange.Add(enemy);
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            EnemySkeleton enemy = other.GetComponent<EnemySkeleton>();
+            if (enemy != null && enemiesInRange.Contains(enemy))
+            {
+                enemiesInRange.Remove(enemy);
+            }
+        }
+    }
     public void OnAttackHit()
     {
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, 0.5f); // Bán kính tấn công có thể điều chỉnh
+        float maxAllowedYDifference = 1.0f; // Điều chỉnh giá trị này theo yêu cầu của bạn
 
-        foreach (Collider2D enemy in hitEnemies)
+        foreach (var enemy in enemiesInRange)
         {
-            if (enemy.CompareTag("Enemy"))
+            if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
             {
-                EnemySkeleton enemySkeleton = enemy.GetComponent<EnemySkeleton>();
-                if (enemySkeleton != null)
-                {
-                    enemySkeleton.TakeDamage(attackDamage);
-                }
+                enemy.TakeDamage(attackDamage);
             }
         }
     }
