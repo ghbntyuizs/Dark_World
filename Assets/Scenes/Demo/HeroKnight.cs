@@ -32,6 +32,7 @@ public class HeroKnight : MonoBehaviour {
     private int currentHealth;
     private bool isDead = false;
     private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
+    public GameManagement gameManger;
     // Use this for initialization
     void Start ()
     {
@@ -196,6 +197,7 @@ public class HeroKnight : MonoBehaviour {
 
             if (currentHealth <= 0)
             {
+
                 Die();
             }
             else
@@ -207,6 +209,7 @@ public class HeroKnight : MonoBehaviour {
     }
     private void Die()
     {
+        gameManger.gameOver();
         isDead = true;
         m_animator.SetTrigger("Death");
     }
