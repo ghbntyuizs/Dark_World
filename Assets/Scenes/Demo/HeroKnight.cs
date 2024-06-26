@@ -207,7 +207,7 @@ public class HeroKnight : MonoBehaviour {
         }
         
     }
-    private void Die()
+    public void Die()
     {
         gameManger.gameOver();
         isDead = true;
