@@ -29,9 +29,11 @@ public class HeroKnight : MonoBehaviour {
     private float               m_rollDuration = 8.0f / 14.0f;
     private float               m_rollCurrentTime;
     private EnemySkeleton enemySkeleton;
+    private FireBoss fireBoss;
     private int currentHealth;
     private bool isDead = false;
     private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
+    private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
     // Use this for initialization
     void Start ()
@@ -44,6 +46,7 @@ public class HeroKnight : MonoBehaviour {
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
         enemySkeleton = FindObjectOfType<EnemySkeleton>();
+        fireBoss = FindObjectOfType<FireBoss>();
         currentHealth = maxHealth;
     }
 
@@ -227,6 +230,14 @@ public class HeroKnight : MonoBehaviour {
                 enemiesInRange.Add(enemy);
             }
         }
+        else if (other.CompareTag("Boss"))
+        {
+            FireBoss boss = other.GetComponent<FireBoss>();
+            if (boss != null && !bossesInRange.Contains(boss))
+            {
+                bossesInRange.Add(boss);
+            }
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -239,10 +250,18 @@ public class HeroKnight : MonoBehaviour {
                 enemiesInRange.Remove(enemy);
             }
         }
+        else if (other.CompareTag("Boss"))
+        {
+            FireBoss boss = other.GetComponent<FireBoss>();
+            if (boss != null && bossesInRange.Contains(boss))
+            {
+                bossesInRange.Remove(boss);
+            }
+        }
     }
     public void OnAttackHit()
     {
-        float maxAllowedYDifference = 1.0f; // Điều chỉnh giá trị này theo yêu cầu của bạn
+        float maxAllowedYDifference = 1.0f;
 
         foreach (var enemy in enemiesInRange)
         {
@@ -250,6 +269,10 @@ public class HeroKnight : MonoBehaviour {
             {
                 enemy.TakeDamage(attackDamage);
             }
+        }
+        foreach (var fireBoss in bossesInRange)
+        {
+                fireBoss.TakeDamage(attackDamage);
         }
     }
 
