@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/DuongN/Game.unity
     guid: f959f882e693b724d9fed03b31b91bcd
+  - enabled: 1
+    path: Assets/DuongN/Level 2.unity
+    guid: 06121c955c99716498408e6140a02be1
+  - enabled: 1
+    path: Assets/DuongN/Level 3.unity
+    guid: 2101770c9b0c8dd45974a9f2df522e39
   m_configObjects: {}
