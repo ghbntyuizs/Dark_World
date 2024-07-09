@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +15,8 @@ namespace Platformer.Gameplay
                 HeroKnight hero = collision.gameObject.GetComponent<HeroKnight>();
                 if (hero != null)
                 {
+                    hero.TakeDamage(hero.currentHealth); // Gây sát thương bằng lượng máu hiện tại
+
                     hero.Die();
                 }
                 {
