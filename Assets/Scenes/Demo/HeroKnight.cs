@@ -12,6 +12,7 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] int maxHealth = 6;
     [SerializeField] private int attackDamage = 1;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private Transform respawnPoint; // Thêm biến để lưu vị trí respawn
     private Animator m_animator;
     private Rigidbody2D m_body2d;
     private Sensor_HeroKnight m_groundSensor;
@@ -33,9 +34,9 @@ public class HeroKnight : MonoBehaviour
     private bool isDead = false;
     private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
     public GameManagement gameManger;
-
     public ThanhMau thanhmau;
 
+    // Use this for initialization
     void Start()
     {
         m_animator = GetComponent<Animator>();
@@ -58,13 +59,23 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
+    // Update is called once per frame
     void Update()
     {
+        if (isDead)
+        {
+            m_body2d.velocity = Vector2.zero; // Đảm bảo nhân vật đứng yên
+            return;
+        }
+
+        // Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
+        // Increase timer that checks roll duration
         if (m_rolling)
             m_rollCurrentTime += Time.deltaTime;
 
+        // Disable rolling if timer extends duration
         if (m_rollCurrentTime > m_rollDuration)
             m_rolling = false;
 
@@ -93,6 +104,7 @@ public class HeroKnight : MonoBehaviour
             m_facingDirection = -1;
         }
 
+        // Move
         if (!m_rolling)
             m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
 
@@ -105,7 +117,10 @@ public class HeroKnight : MonoBehaviour
         {
             m_animator.SetBool("noBlood", m_noBlood);
             m_animator.SetTrigger("Death");
+            Die();  // Thay đổi từ Invoke thành trực tiếp gọi Die()
         }
+
+        //Hurt
         else if (Input.GetKeyDown("q") && !m_rolling)
             m_animator.SetTrigger("Hurt");
 
@@ -137,6 +152,8 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetTrigger("Roll");
             m_body2d.velocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.velocity.y);
         }
+
+        //Jump
         else if (Input.GetKeyDown("space") && m_grounded && !m_rolling)
         {
             m_animator.SetTrigger("Jump");
@@ -179,11 +196,49 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    public void Die()
+    private void Die()
     {
-        gameManger.gameOver();
         isDead = true;
         m_animator.SetTrigger("Death");
+
+        // Bắt đầu Coroutine để hồi sinh sau 0.7 giây
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    private IEnumerator RespawnCoroutine()
+    {
+        // Đợi 0.7 giây trước khi hồi sinh
+        yield return new WaitForSeconds(0.7f);
+
+        Respawn();
+    }
+
+    private void Respawn()
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("Respawn point is not assigned!");
+            return;
+        }
+
+        // Khôi phục trạng thái ban đầu
+        currentHealth = maxHealth;
+        isDead = false;
+        transform.position = respawnPoint.position; // Di chuyển nhân vật đến vị trí respawn
+
+        // Khôi phục trạng thái Animator
+        m_animator.SetTrigger("Respawn"); // Kích hoạt animation hồi sinh nếu có
+        m_body2d.isKinematic = false;
+        m_body2d.simulated = true;
+
+        // Khôi phục trạng thái nhân vật
+        m_animator.SetBool("Grounded", true);
+        m_animator.SetInteger("AnimState", 0);
+        m_rolling = false;  // Đặt lại trạng thái rolling
+        m_facingDirection = 1;  // Đặt lại hướng nhân vật sang phải
+
+        // Khôi phục hướng của nhân vật
+        GetComponent<SpriteRenderer>().flipX = false;
     }
 
     public bool IsDead()
