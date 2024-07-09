@@ -2,32 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class HeroKnight : MonoBehaviour {
-
-    [SerializeField] float      m_speed = 4.0f;
-    [SerializeField] float      m_jumpForce = 7.5f;
-    [SerializeField] float      m_rollForce = 6.0f;
-    [SerializeField] bool       m_noBlood = false;
+public class HeroKnight : MonoBehaviour
+{
+    [SerializeField] float m_speed = 4.0f;
+    [SerializeField] float m_jumpForce = 7.5f;
+    [SerializeField] float m_rollForce = 6.0f;
+    [SerializeField] bool m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
     [SerializeField] int maxHealth = 6;
     [SerializeField] private int attackDamage = 1;
     [SerializeField] private LayerMask enemyLayer;
-    private Animator            m_animator;
-    private Rigidbody2D         m_body2d;
-    private Sensor_HeroKnight   m_groundSensor;
-    private Sensor_HeroKnight   m_wallSensorR1;
-    private Sensor_HeroKnight   m_wallSensorR2;
-    private Sensor_HeroKnight   m_wallSensorL1;
-    private Sensor_HeroKnight   m_wallSensorL2;
-    private bool                m_isWallSliding = false;
-    private bool                m_grounded = false;
-    private bool                m_rolling = false;
-    private int                 m_facingDirection = 1;
-    private int                 m_currentAttack = 0;
-    private float               m_timeSinceAttack = 0.0f;
-    private float               m_delayToIdle = 0.0f;
-    private float               m_rollDuration = 8.0f / 14.0f;
-    private float               m_rollCurrentTime;
+    [SerializeField] private Transform respawnPoint; // Thêm biến để lưu vị trí respawn
+    private Animator m_animator;
+    private Rigidbody2D m_body2d;
+    private Sensor_HeroKnight m_groundSensor;
+    private Sensor_HeroKnight m_wallSensorR1;
+    private Sensor_HeroKnight m_wallSensorR2;
+    private Sensor_HeroKnight m_wallSensorL1;
+    private Sensor_HeroKnight m_wallSensorL2;
+    private bool m_isWallSliding = false;
+    private bool m_grounded = false;
+    private bool m_rolling = false;
+    private int m_facingDirection = 1;
+    private int m_currentAttack = 0;
+    private float m_timeSinceAttack = 0.0f;
+    private float m_delayToIdle = 0.0f;
+    private float m_rollDuration = 8.0f / 14.0f;
+    private float m_rollCurrentTime;
     private EnemySkeleton enemySkeleton;
     private FireBoss fireBoss;
     private int currentHealth;
@@ -35,8 +36,9 @@ public class HeroKnight : MonoBehaviour {
     private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
     private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
+
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
@@ -51,17 +53,23 @@ public class HeroKnight : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
+        if (isDead)
+        {
+            m_body2d.velocity = Vector2.zero; // Đảm bảo nhân vật đứng yên
+            return;
+        }
+
         // Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
         // Increase timer that checks roll duration
-        if(m_rolling)
+        if (m_rolling)
             m_rollCurrentTime += Time.deltaTime;
 
         // Disable rolling if timer extends duration
-        if(m_rollCurrentTime > m_rollDuration)
+        if (m_rollCurrentTime > m_rollDuration)
             m_rolling = false;
 
         //Check if character just landed on the ground
@@ -87,7 +95,6 @@ public class HeroKnight : MonoBehaviour {
             GetComponent<SpriteRenderer>().flipX = false;
             m_facingDirection = 1;
         }
-            
         else if (inputX < 0)
         {
             GetComponent<SpriteRenderer>().flipX = true;
@@ -95,7 +102,7 @@ public class HeroKnight : MonoBehaviour {
         }
 
         // Move
-        if (!m_rolling )
+        if (!m_rolling)
             m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
 
         //Set AirSpeed in animator
@@ -111,8 +118,9 @@ public class HeroKnight : MonoBehaviour {
         {
             m_animator.SetBool("noBlood", m_noBlood);
             m_animator.SetTrigger("Death");
+            Die();  // Thay đổi từ Invoke thành trực tiếp gọi Die()
         }
-            
+
         //Hurt
         else if (Input.GetKeyDown("q") && !m_rolling)
             m_animator.SetTrigger("Hurt");
@@ -160,7 +168,6 @@ public class HeroKnight : MonoBehaviour {
             m_animator.SetTrigger("Roll");
             m_body2d.velocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.velocity.y);
         }
-            
 
         //Jump
         else if (Input.GetKeyDown("space") && m_grounded && !m_rolling)
@@ -185,8 +192,8 @@ public class HeroKnight : MonoBehaviour {
         {
             // Prevents flickering transitions to idle
             m_delayToIdle -= Time.deltaTime;
-                if(m_delayToIdle < 0)
-                    m_animator.SetInteger("AnimState", 0);
+            if (m_delayToIdle < 0)
+                m_animator.SetInteger("AnimState", 0);
         }
     }
 
@@ -195,12 +202,12 @@ public class HeroKnight : MonoBehaviour {
 
     public void TakeDamage(int damage)
     {
-        if (!isDead) {
+        if (!isDead)
+        {
             currentHealth -= damage;
 
             if (currentHealth <= 0)
             {
-
                 Die();
             }
             else
@@ -208,18 +215,58 @@ public class HeroKnight : MonoBehaviour {
                 m_animator.SetTrigger("Hurt");
             }
         }
-        
     }
+
     private void Die()
     {
-        gameManger.gameOver();
         isDead = true;
         m_animator.SetTrigger("Death");
+
+        // Bắt đầu Coroutine để hồi sinh sau 0.7 giây
+        StartCoroutine(RespawnCoroutine());
     }
+
+    private IEnumerator RespawnCoroutine()
+    {
+        // Đợi 0.7 giây trước khi hồi sinh
+        yield return new WaitForSeconds(0.7f);
+
+        Respawn();
+    }
+
+    private void Respawn()
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("Respawn point is not assigned!");
+            return;
+        }
+
+        // Khôi phục trạng thái ban đầu
+        currentHealth = maxHealth;
+        isDead = false;
+        transform.position = respawnPoint.position; // Di chuyển nhân vật đến vị trí respawn
+
+        // Khôi phục trạng thái Animator
+        m_animator.SetTrigger("Respawn"); // Kích hoạt animation hồi sinh nếu có
+        m_body2d.isKinematic = false;
+        m_body2d.simulated = true;
+
+        // Khôi phục trạng thái nhân vật
+        m_animator.SetBool("Grounded", true);
+        m_animator.SetInteger("AnimState", 0);
+        m_rolling = false;  // Đặt lại trạng thái rolling
+        m_facingDirection = 1;  // Đặt lại hướng nhân vật sang phải
+
+        // Khôi phục hướng của nhân vật
+        GetComponent<SpriteRenderer>().flipX = false;
+    }
+
     public bool IsDead()
     {
         return isDead;
     }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))
@@ -259,6 +306,7 @@ public class HeroKnight : MonoBehaviour {
             }
         }
     }
+
     public void OnAttackHit()
     {
         float maxAllowedYDifference = 1.0f;
@@ -272,15 +320,16 @@ public class HeroKnight : MonoBehaviour {
         }
         foreach (var fireBoss in bossesInRange)
         {
-                fireBoss.TakeDamage(attackDamage);
+            fireBoss.TakeDamage(attackDamage);
         }
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 0.5f); 
+        Gizmos.DrawWireSphere(transform.position, 0.5f);
     }
+
     void AE_SlideDust()
     {
         Vector3 spawnPosition;
