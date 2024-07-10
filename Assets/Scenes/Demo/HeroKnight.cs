@@ -31,12 +31,12 @@ public class HeroKnight : MonoBehaviour
     private float m_rollCurrentTime;
     private EnemySkeleton enemySkeleton;
     private FireBoss fireBoss;
-    private int currentHealth;
+    public int currentHealth;
     private bool isDead = false;
     private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
     private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
-
+    public ThanhMau thanhmau;
     // Use this for initialization
     void Start()
     {
@@ -50,6 +50,14 @@ public class HeroKnight : MonoBehaviour
         enemySkeleton = FindObjectOfType<EnemySkeleton>();
         fireBoss = FindObjectOfType<FireBoss>();
         currentHealth = maxHealth;
+        if (thanhmau != null)
+        {
+            thanhmau.capNhatThanhMau(currentHealth, maxHealth);
+        }
+        else
+        {
+            Debug.LogError("Thanh mau chưa được gán trong Inspector.");
+        }
     }
 
     // Update is called once per frame
@@ -205,6 +213,10 @@ public class HeroKnight : MonoBehaviour
         if (!isDead)
         {
             currentHealth -= damage;
+            if (thanhmau != null)
+            {
+                thanhmau.capNhatThanhMau(currentHealth, maxHealth);
+            }
 
             if (currentHealth <= 0)
             {
@@ -217,7 +229,7 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
         isDead = true;
         m_animator.SetTrigger("Death");
