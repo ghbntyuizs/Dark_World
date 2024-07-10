@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class HeroKnight : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class HeroKnight : MonoBehaviour
     private FireBoss fireBoss;
     public int currentHealth;
     private bool isDead = false;
-    private List<EnemySkeleton> enemiesInRange = new List<EnemySkeleton>();
+    private List<EnemyBase> enemiesInRange = new List<EnemyBase>();
     private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
     public ThanhMau thanhmau;
@@ -283,7 +284,7 @@ public class HeroKnight : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            EnemySkeleton enemy = other.GetComponent<EnemySkeleton>();
+            EnemyBase enemy = other.GetComponent<EnemyBase>();
             if (enemy != null && !enemiesInRange.Contains(enemy))
             {
                 enemiesInRange.Add(enemy);
@@ -303,7 +304,7 @@ public class HeroKnight : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            EnemySkeleton enemy = other.GetComponent<EnemySkeleton>();
+            EnemyBase enemy = other.GetComponent<EnemyBase>();
             if (enemy != null && enemiesInRange.Contains(enemy))
             {
                 enemiesInRange.Remove(enemy);
@@ -325,9 +326,12 @@ public class HeroKnight : MonoBehaviour
 
         foreach (var enemy in enemiesInRange)
         {
-            if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
+            if (enemy is EnemySkeleton || enemy is EnemyGoblin) // Check if enemy is either type
             {
-                enemy.TakeDamage(attackDamage);
+                if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
+                {
+                    enemy.TakeDamage(attackDamage);
+                }
             }
         }
         foreach (var fireBoss in bossesInRange)
