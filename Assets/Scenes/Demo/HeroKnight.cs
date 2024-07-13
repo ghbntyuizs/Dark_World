@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.SceneManagement; // Import namespace này
 
 public class HeroKnight : MonoBehaviour
 {
@@ -13,7 +13,6 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] int maxHealth = 6;
     [SerializeField] private int attackDamage = 1;
     [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private Transform respawnPoint; // Thêm biến để lưu vị trí respawn
     private Animator m_animator;
     private Rigidbody2D m_body2d;
     private Sensor_HeroKnight m_groundSensor;
@@ -235,44 +234,22 @@ public class HeroKnight : MonoBehaviour
         isDead = true;
         m_animator.SetTrigger("Death");
 
-        // Bắt đầu Coroutine để hồi sinh sau 0.7 giây
-        StartCoroutine(RespawnCoroutine());
+        // Bắt đầu Coroutine để reset scene sau 0.7 giây
+        StartCoroutine(ResetSceneCoroutine());
     }
 
-    private IEnumerator RespawnCoroutine()
+    private IEnumerator ResetSceneCoroutine()
     {
-        // Đợi 0.7 giây trước khi hồi sinh
+        // Đợi 0.7 giây trước khi reset scene
         yield return new WaitForSeconds(0.7f);
 
-        Respawn();
+        ResetScene();
     }
 
-    private void Respawn()
+    private void ResetScene()
     {
-        if (respawnPoint == null)
-        {
-            Debug.LogWarning("Respawn point is not assigned!");
-            return;
-        }
-
-        // Khôi phục trạng thái ban đầu
-        currentHealth = maxHealth;
-        isDead = false;
-        transform.position = respawnPoint.position; // Di chuyển nhân vật đến vị trí respawn
-
-        // Khôi phục trạng thái Animator
-        m_animator.SetTrigger("Respawn"); // Kích hoạt animation hồi sinh nếu có
-        m_body2d.isKinematic = false;
-        m_body2d.simulated = true;
-
-        // Khôi phục trạng thái nhân vật
-        m_animator.SetBool("Grounded", true);
-        m_animator.SetInteger("AnimState", 0);
-        m_rolling = false;  // Đặt lại trạng thái rolling
-        m_facingDirection = 1;  // Đặt lại hướng nhân vật sang phải
-
-        // Khôi phục hướng của nhân vật
-        GetComponent<SpriteRenderer>().flipX = false;
+        // Tải lại scene hiện tại
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public bool IsDead()
@@ -326,12 +303,9 @@ public class HeroKnight : MonoBehaviour
 
         foreach (var enemy in enemiesInRange)
         {
-            if (enemy is EnemySkeleton || enemy is EnemyGoblin) // Check if enemy is either type
+            if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
             {
-                if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
-                {
-                    enemy.TakeDamage(attackDamage);
-                }
+                enemy.TakeDamage(attackDamage);
             }
         }
         foreach (var fireBoss in bossesInRange)
