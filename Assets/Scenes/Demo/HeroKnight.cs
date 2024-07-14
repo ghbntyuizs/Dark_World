@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement; // Import namespace này
 
 public class HeroKnight : MonoBehaviour
 {
+    public GameManagement gameManager;
     [SerializeField] float m_speed = 4.0f;
     [SerializeField] float m_jumpForce = 7.5f;
     [SerializeField] float m_rollForce = 6.0f;
@@ -37,6 +38,7 @@ public class HeroKnight : MonoBehaviour
     private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
     public ThanhMau thanhmau;
+
     // Use this for initialization
     void Start()
     {
@@ -218,7 +220,7 @@ public class HeroKnight : MonoBehaviour
                 thanhmau.capNhatThanhMau(currentHealth, maxHealth);
             }
 
-            if (currentHealth <= 0)
+            if (currentHealth <= 0 && !isDead)
             {
                 Die();
             }
@@ -233,23 +235,19 @@ public class HeroKnight : MonoBehaviour
     {
         isDead = true;
         m_animator.SetTrigger("Death");
+        gameManager.gameOver();
 
-        // Bắt đầu Coroutine để reset scene sau 0.7 giây
-        StartCoroutine(ResetSceneCoroutine());
+        // Bắt đầu Coroutine để chuyển đến scene GameOver sau 0.7 giây
+        StartCoroutine(LoadGameOverScene());
     }
 
-    private IEnumerator ResetSceneCoroutine()
+    private IEnumerator LoadGameOverScene()
     {
-        // Đợi 0.7 giây trước khi reset scene
+        // Đợi 0.7 giây trước khi chuyển đến scene GameOver
         yield return new WaitForSeconds(0.7f);
 
-        ResetScene();
-    }
-
-    private void ResetScene()
-    {
-        // Tải lại scene hiện tại
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // Tải scene GameOver
+        SceneManager.LoadScene("GameOver");
     }
 
     public bool IsDead()
@@ -338,3 +336,4 @@ public class HeroKnight : MonoBehaviour
         }
     }
 }
+    
