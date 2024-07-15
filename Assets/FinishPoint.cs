@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FinishPoint : MonoBehaviour
 {
@@ -8,8 +9,17 @@ public class FinishPoint : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            //go to next lv
+            UnLockedNewLevel();
             SceneController.instance.NextLevel();
+        }
+    }
+    void UnLockedNewLevel()
+    {
+        if (SceneManager.GetActiveScene().buildIndex >= PlayerPrefs.GetInt("ReachedIndex"))
+        {
+            PlayerPrefs.SetInt("ReachedIndex", SceneManager.GetActiveScene().buildIndex+1);
+            PlayerPrefs.SetInt("UnLockedNewLevel", PlayerPrefs.GetInt("UnLockedNewLevel",1)+ 1);
+            PlayerPrefs.Save();
         }
     }
 }

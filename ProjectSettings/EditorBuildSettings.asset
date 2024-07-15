@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MenuController.unity
+    path: Assets/DuongN/MenuController.unity
     guid: 6ee39b1abd2e1984e88910053bf51277
   - enabled: 1
     path: Assets/DuongN/Game.unity
