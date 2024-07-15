@@ -1,7 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿
 using System.Collections.Generic;
-using UnityEngine.SceneManagement; // Import namespace này
+using UnityEngine.SceneManagement;
+using UnityEngine;
+using System.Collections;
+
+
+// Import namespace này
 
 public class HeroKnight : MonoBehaviour
 {
@@ -38,12 +42,17 @@ public class HeroKnight : MonoBehaviour
     private List<FireBoss> bossesInRange = new List<FireBoss>();
     public GameManagement gameManger;
     public ThanhMau thanhmau;
+    public ScoreboardManager scoreboardManager;
+    public GameObject scoreboard;
 
     // Use this for initialization
     private bool isBlocking = false;
     private int currentDamage;
     void Start()
     {
+        ResetScore();
+        SaveOldScore();    // Lưu điểm cũ
+
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
@@ -251,6 +260,7 @@ public class HeroKnight : MonoBehaviour
         isDead = true;
         m_animator.SetTrigger("Death");
         gameManager.gameOver();
+        scoreboard.SetActive(true);
 
         // Bắt đầu Coroutine để chuyển đến scene GameOver sau 0.7 giây
         StartCoroutine(LoadGameOverScene());
@@ -319,11 +329,15 @@ public class HeroKnight : MonoBehaviour
             if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
             {
                 enemy.TakeDamage(currentDamage);
+                AddScore(10); // Thêm 10 điểm khi chém quái
+
             }
         }
         foreach (var fireBoss in bossesInRange)
         {
             fireBoss.TakeDamage(currentDamage);
+            AddScore(20); // Thêm 10 điểm khi chém quái
+
         }
     }
     public void IncreaseDamage(int amount)
@@ -377,5 +391,44 @@ public class HeroKnight : MonoBehaviour
             dust.transform.localScale = new Vector3(m_facingDirection, 1, 1);
         }
     }
+    public void AddScore(int score)
+    {
+        int currentScore = PlayerPrefs.GetInt("PlayerScore", 0);
+        currentScore += score;
+        PlayerPrefs.SetInt("PlayerScore", currentScore);
+        PlayerPrefs.Save();
+
+        // Gọi phương thức lưu điểm cũ
+        SaveOldScore();
+
+        // Cập nhật hiển thị điểm
+        if (scoreboardManager != null)
+        {
+            scoreboardManager.UpdateScoreText(currentScore);
+        }
+        else
+        {
+            Debug.LogWarning("ScoreboardManager chưa được gán trong Inspector.");
+        }
+    }
+
+    public void ResetScore()
+    {
+        PlayerPrefs.SetInt("PlayerScore", 0);
+        PlayerPrefs.Save();
+    }
+    public void SaveOldScore()
+    {
+        // Lưu điểm hiện tại
+        int currentScore = PlayerPrefs.GetInt("PlayerScore", 0);
+
+        // Lưu các điểm cũ theo thứ tự
+
+
+        // Lưu vào PlayerPrefs
+        PlayerPrefs.Save();
+    }
+
+
+
 }
-    

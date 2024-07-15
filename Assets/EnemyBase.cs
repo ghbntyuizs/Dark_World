@@ -106,7 +106,7 @@ public abstract class EnemyBase : MonoBehaviour
             Vector3 spawnPosition = new Vector3(enemyPosition.x, posY, enemyPosition.z);
             Instantiate(healthPotionPrefab, spawnPosition, Quaternion.identity);
         }
-        else if (randomChance <= 100 && swordPrefab != null)
+        else if (randomChance <= 20 && swordPrefab != null)
         {
             Vector3 enemyPosition = transform.position;
 
