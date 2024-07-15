@@ -2003,7 +2003,7 @@ Transform:
   m_GameObject: {fileID: 757024912}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.5227742, y: -0.00035, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2792,6 +2792,10 @@ MonoBehaviour:
   health: 3
   attackCooldown: 1
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 4323765045475314521, guid: 463d7490e66b71b48829ae83d7d8130e,
+    type: 3}
+  swordPrefab: {fileID: 7177601348617888379, guid: 53cb1f68438d6da4894e41625f2da2df,
+    type: 3}
 --- !u!95 &1093364079
 Animator:
   serializedVersion: 5
@@ -2880,7 +2884,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.011242747, y: -0.089938164}
+  m_Offset: {x: -0.0112428665, y: -0.6821244}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2891,7 +2895,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4.5803843, y: 0.7355256}
+  m_Size: {x: 4.5803843, y: 2.7506428}
   m_EdgeRadius: 0
 --- !u!50 &1093364082
 Rigidbody2D:
@@ -3068,6 +3072,8 @@ MonoBehaviour:
   health: 3
   attackCooldown: 1
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 0}
+  swordPrefab: {fileID: 0}
 --- !u!95 &1124120134
 Animator:
   serializedVersion: 5
@@ -3536,6 +3542,8 @@ MonoBehaviour:
   health: 5
   attackCooldown: 1.5
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 0}
+  swordPrefab: {fileID: 0}
 --- !u!70 &1290973930
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -10307,6 +10315,8 @@ MonoBehaviour:
   health: 5
   attackCooldown: 1.5
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 0}
+  swordPrefab: {fileID: 0}
 --- !u!70 &1584051948
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -10544,6 +10554,8 @@ MonoBehaviour:
   health: 5
   attackCooldown: 1.5
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 0}
+  swordPrefab: {fileID: 0}
 --- !u!70 &1721681293
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -11619,6 +11631,10 @@ MonoBehaviour:
   health: 5
   attackCooldown: 1.5
   animator: {fileID: 0}
+  healthPotionPrefab: {fileID: 4323765045475314521, guid: 463d7490e66b71b48829ae83d7d8130e,
+    type: 3}
+  swordPrefab: {fileID: 7177601348617888379, guid: 53cb1f68438d6da4894e41625f2da2df,
+    type: 3}
 --- !u!70 &2099123720
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -11781,7 +11797,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.010943174, y: 0.109414786}
+  m_Offset: {x: 0.010943174, y: 0.35919935}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -11792,7 +11808,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.469788, y: 0.95292634}
+  m_Size: {x: 3.469788, y: 1.3177806}
   m_EdgeRadius: 0
 --- !u!114 &2099123725
 MonoBehaviour:
@@ -11996,6 +12012,142 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &4135966487160011994
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 19.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2090229350071493266, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4323765045475314521, guid: 463d7490e66b71b48829ae83d7d8130e,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthPotion
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 463d7490e66b71b48829ae83d7d8130e, type: 3}
+--- !u!1001 &8173550123723173995
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922838073944630541, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7177601348617888379, guid: 53cb1f68438d6da4894e41625f2da2df,
+        type: 3}
+      propertyPath: m_Name
+      value: SilverSword
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 53cb1f68438d6da4894e41625f2da2df, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -12026,3 +12178,5 @@ SceneRoots:
   - {fileID: 384831257}
   - {fileID: 1093364084}
   - {fileID: 1124120139}
+  - {fileID: 4135966487160011994}
+  - {fileID: 8173550123723173995}

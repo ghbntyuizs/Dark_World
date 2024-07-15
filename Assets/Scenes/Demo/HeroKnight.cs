@@ -38,6 +38,8 @@ public class HeroKnight : MonoBehaviour
     public GameManagement gameManger;
     public ThanhMau thanhmau;
     // Use this for initialization
+    private bool isBlocking = false;
+    private int currentDamage;
     void Start()
     {
         m_animator = GetComponent<Animator>();
@@ -50,6 +52,7 @@ public class HeroKnight : MonoBehaviour
         enemySkeleton = FindObjectOfType<EnemySkeleton>();
         fireBoss = FindObjectOfType<FireBoss>();
         currentHealth = maxHealth;
+        currentDamage = attackDamage;
         if (thanhmau != null)
         {
             thanhmau.capNhatThanhMau(currentHealth, maxHealth);
@@ -164,6 +167,12 @@ public class HeroKnight : MonoBehaviour
         {
             m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
+            isBlocking = true; // Bật trạng thái block
+        }
+        else if (Input.GetMouseButtonUp(1) || Input.GetKeyUp("k"))
+        {
+            m_animator.SetBool("IdleBlock", false);
+            isBlocking = false; // Tắt trạng thái block
         }
 
         else if (Input.GetMouseButtonUp(1))
@@ -212,6 +221,12 @@ public class HeroKnight : MonoBehaviour
     {
         if (!isDead)
         {
+            if (isBlocking)
+            {
+                Debug.Log("Blocked the damage!");
+                return; // Chặn damage
+            }
+
             currentHealth -= damage;
             if (thanhmau != null)
             {
@@ -305,13 +320,40 @@ public class HeroKnight : MonoBehaviour
         {
             if (Mathf.Abs(transform.position.y - enemy.transform.position.y) <= maxAllowedYDifference)
             {
-                enemy.TakeDamage(attackDamage);
+                enemy.TakeDamage(currentDamage);
             }
         }
         foreach (var fireBoss in bossesInRange)
         {
-            fireBoss.TakeDamage(attackDamage);
+            fireBoss.TakeDamage(currentDamage);
         }
+    }
+    public void IncreaseDamage(int amount)
+    {
+        currentDamage += amount;
+        Debug.Log("HeroKnight's damage increased to: " + currentDamage);
+        // Thực hiện các hành động khác khi tăng damage, nếu cần
+    }
+    public void Heal(int amount)
+    {
+        if (!isDead)
+        {
+            currentHealth += amount;
+            if (currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth; // Đảm bảo không vượt quá máu tối đa
+            }
+            Debug.Log("Healed! Current Health: " + currentHealth);
+
+            if (thanhmau != null)
+            {
+                thanhmau.capNhatThanhMau(currentHealth, maxHealth);
+            }
+        }
+    }
+    public bool CanHeal()
+    {
+        return currentHealth < maxHealth;
     }
 
     private void OnDrawGizmosSelected()
