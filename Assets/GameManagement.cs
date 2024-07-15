@@ -16,5 +16,8 @@ public class GameManagement : MonoBehaviour
     {
         
     }
-
+    public void gameOver()
+    {
+        gameOverUI.SetActive(true);
+    }
 }
