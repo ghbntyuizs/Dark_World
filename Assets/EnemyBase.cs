@@ -12,15 +12,19 @@ public abstract class EnemyBase : MonoBehaviour
     public Animator animator;
     protected Rigidbody2D rb;
     protected BoxCollider2D boxCollider; // Thêm khai báo biến boxCollider
+    protected CapsuleCollider2D capsuleCollider;
     private bool isFollowing = false;
     private bool isAttacking = false;
     private bool isDead = false;
+    public GameObject healthPotionPrefab;
+    public GameObject swordPrefab;
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>(); // Khởi tạo boxCollider
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
     }
 
     protected virtual void Update()
@@ -83,7 +87,42 @@ public abstract class EnemyBase : MonoBehaviour
         isDead = true;
         animator.SetTrigger("die");
         rb.velocity = Vector2.zero;
-        Destroy(gameObject, 2f);
+
+        int randomChance = Random.Range(0, 100);
+
+        // Nếu randomChance nhỏ hơn hoặc bằng 15, thì tạo health potion
+        if (randomChance <= 10 && healthPotionPrefab != null)
+        {
+            Vector3 enemyPosition = transform.position;
+
+            // Lấy kích thước của CapsuleCollider để tính toán vị trí dưới chân chính xác hơn
+            CapsuleCollider2D enemyCollider = GetComponent<CapsuleCollider2D>();
+            float colliderHeight = enemyCollider.size.y;
+
+            // Tính toán vị trí rơi của bình máu dưới chân của Enemy
+            float posY = enemyPosition.y - (colliderHeight / 2);
+
+            // Tạo Prefab của Health Potion dưới chân của quái vật
+            Vector3 spawnPosition = new Vector3(enemyPosition.x, posY, enemyPosition.z);
+            Instantiate(healthPotionPrefab, spawnPosition, Quaternion.identity);
+        }
+        else if (randomChance <= 100 && swordPrefab != null)
+        {
+            Vector3 enemyPosition = transform.position;
+
+            // Lấy kích thước của CapsuleCollider để tính toán vị trí dưới chân chính xác hơn
+            CapsuleCollider2D enemyCollider = GetComponent<CapsuleCollider2D>();
+            float colliderHeight = enemyCollider.size.y;
+
+            // Tính toán vị trí rơi của thanh kiếm dưới chân của Enemy
+            float posY = enemyPosition.y - (colliderHeight / 2);
+
+            // Tạo Prefab của Sword dưới chân của quái vật
+            Vector3 spawnPosition = new Vector3(enemyPosition.x, posY, enemyPosition.z);
+            Instantiate(swordPrefab, spawnPosition, Quaternion.identity);
+        }
+        // Hủy đối tượng Enemy sau 1 giây
+        Destroy(gameObject, 1f);
     }
 
     public bool IsDead()
